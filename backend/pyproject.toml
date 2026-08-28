@@ -12,6 +12,12 @@ dependencies = [
 dev = [
     "pytest>=8.0",
 ]
+harness = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
+    "httpx>=0.27",
+]
 
 [build-system]
 requires = ["setuptools>=68"]
