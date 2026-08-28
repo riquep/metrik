@@ -1,0 +1,25 @@
+{
+  "evaluation": {
+    "device_model": "InBody370S",
+    "measured_at": "2025-10-02T14:08:00",
+    "patient_ref": { "device_id": "200325-4" },
+    "biometrics": { "altura_cm": 178, "idade": 39, "sexo": "M" }
+  },
+  "metrics": [
+    { "key": "peso", "value": 89.9, "unit": "kg", "ref_min": 59.2, "ref_max": 80.2 },
+    { "key": "imc", "value": 28.4, "unit": "kg/m2", "ref_min": null, "ref_max": null },
+    { "key": "pgc", "value": 24.2, "unit": "%", "ref_min": null, "ref_max": null },
+    { "key": "massa_muscular_esqueletica", "value": 38.3, "unit": "kg", "ref_min": null, "ref_max": null },
+    { "key": "massa_gordura", "value": 21.8, "unit": "kg", "ref_min": 8.4, "ref_max": 16.7 },
+    { "key": "agua_corporal_total", "value": 50.1, "unit": "L", "ref_min": 39.2, "ref_max": 47.8 },
+    { "key": "taxa_metabolica_basal", "value": 1841, "unit": "kcal", "ref_min": 1856, "ref_max": 2186 },
+    { "key": "gordura_visceral", "value": 10, "unit": "nivel", "ref_min": 1, "ref_max": 9 },
+    { "key": "relacao_cintura_quadril", "value": 0.96, "unit": null, "ref_min": 0.80, "ref_max": 0.90 },
+    { "key": "pontuacao_inbody", "value": 79, "unit": "pontos", "ref_min": null, "ref_max": null }
+  ],
+  "raw_extraction": {
+    "parser_version": "inbody370s-v1",
+    "confidence": "ok",
+    "warnings": []
+  }
+}
