@@ -13,7 +13,7 @@ Precisa do backend rodando em `http://localhost:8000` (ver
 
 ```bash
 cd backend
-pip install -e ".[dev,harness]"
+pip install -e ".[dev]"
 uvicorn dev_harness.main:app --reload
 ```
 
@@ -26,3 +26,20 @@ npm run dev
 ```
 
 Abre em `http://localhost:5173`.
+
+## URL do backend
+
+Por padrão o frontend chama `http://localhost:8000`. Pra apontar pra
+outro backend (ex: o backend publicado na Vercel), defina
+`VITE_BACKEND_URL` — veja `.env.example`. Localmente, copie pra `.env`:
+
+```bash
+cp .env.example .env
+# edite VITE_BACKEND_URL em .env
+```
+
+No projeto `metrik_front` na Vercel, defina `VITE_BACKEND_URL` em
+Settings → Environment Variables com a URL do projeto `metrik_api` (ex:
+`https://metrik-ezekcdcpd-riqueps-projects.vercel.app`) e redeploy o
+frontend — variáveis `VITE_*` são embutidas no build, então mudar o valor
+exige um novo build, não só reiniciar.
