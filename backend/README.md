@@ -7,7 +7,7 @@ descartável (`src/dev_harness/`).
 
 ```bash
 cd backend
-pip install -e ".[dev,harness]"
+pip install -e ".[dev]"
 ```
 
 ## Rodar os testes
