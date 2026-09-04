@@ -35,12 +35,7 @@ def upgrade() -> None:
             sa.ForeignKey("clinics.id"),
             nullable=False,
         ),
-        sa.Column(
-            "patient_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("patients.id"),
-            nullable=False,
-        ),
+        sa.Column("patient_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("token", sa.Text(), nullable=False),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("used_at", sa.DateTime(timezone=True), nullable=True),
@@ -51,6 +46,13 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
         ),
         sa.UniqueConstraint("token", name="uq_invites_token"),
+        # FK composta: garante que patient_id pertence à mesma clinic_id
+        # deste convite — patients tem uq_patients_clinic_id_id.
+        sa.ForeignKeyConstraint(
+            ["clinic_id", "patient_id"],
+            ["patients.clinic_id", "patients.id"],
+            name="fk_invites_clinic_patient",
+        ),
     )
 
     op.execute("ALTER TABLE invites ENABLE ROW LEVEL SECURITY")

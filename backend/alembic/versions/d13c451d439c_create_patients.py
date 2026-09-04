@@ -47,6 +47,11 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
         ),
         sa.UniqueConstraint("clinic_id", "cpf", name="uq_patients_clinic_cpf"),
+        # Exigida pelo Postgres pra permitir FKs compostas (clinic_id, patient_id)
+        # de evaluations/invites — sem isso nada impede uma sessão da clínica A
+        # inserir uma linha com clinic_id=A mas patient_id de um paciente da
+        # clínica B (a checagem de FK roda com privilégio interno, ignora RLS).
+        sa.UniqueConstraint("clinic_id", "id", name="uq_patients_clinic_id_id"),
     )
     op.create_index("ix_patients_clinic_id", "patients", ["clinic_id"])
 

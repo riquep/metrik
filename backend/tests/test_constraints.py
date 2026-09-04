@@ -2,6 +2,11 @@ import uuid
 from datetime import datetime, timezone
 
 import pytest
+
+# sqlalchemy só vem com o extra opcional `db` — pula o módulo inteiro (em vez
+# de quebrar a collection do pytest) se só `.[dev]` estiver instalado.
+pytest.importorskip("sqlalchemy")
+
 from sqlalchemy.exc import IntegrityError
 
 from metrik.db.base import tenant_session
@@ -66,6 +71,34 @@ def test_mesmo_cpf_em_clinica_diferente_funciona(
             )
         )
     # chegar até aqui sem exceção já é a asserção: mesmo CPF, clínica diferente, sem conflito.
+
+
+def test_evaluation_com_patient_de_outra_clinica_falha(
+    app_session_factory, clinic: Clinic, other_clinic: Clinic
+) -> None:
+    """FK composta (clinic_id, patient_id): sem ela, RLS só valida o
+    clinic_id da própria linha no INSERT — nada impedia uma sessão da
+    clínica A inserir uma evaluation com clinic_id=A mas patient_id de um
+    paciente que na verdade é da clínica B (checagem de FK roda com
+    privilégio interno, ignora RLS de quem está inserindo)."""
+    other_patient_id = uuid.uuid4()
+    with tenant_session(other_clinic.id, app_session_factory) as session:
+        session.add(
+            Patient(
+                id=other_patient_id, clinic_id=other_clinic.id, nome="Paciente da outra clínica",
+                email="outro@example.com", cpf="555.555.555-55",
+            )
+        )
+
+    with pytest.raises(IntegrityError, match="fk_evaluations_clinic_patient"):
+        with tenant_session(clinic.id, app_session_factory) as session:
+            session.add(
+                Evaluation(
+                    id=uuid.uuid4(), clinic_id=clinic.id, patient_id=other_patient_id,
+                    measured_at=datetime.now(timezone.utc), device_model="InBody370S",
+                    pdf_storage_key="x.pdf", parser_version="inbody370s-v1", status="processado",
+                )
+            )
 
 
 def test_metrica_duplicada_na_mesma_avaliacao_falha(

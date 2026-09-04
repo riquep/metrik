@@ -35,12 +35,7 @@ def upgrade() -> None:
             sa.ForeignKey("clinics.id"),
             nullable=False,
         ),
-        sa.Column(
-            "patient_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("patients.id"),
-            nullable=False,
-        ),
+        sa.Column("patient_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("measured_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("device_model", sa.Text(), nullable=False),
         sa.Column("pdf_storage_key", sa.Text(), nullable=False),
@@ -52,6 +47,15 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.text("now()"),
         ),
+        # FK composta (não só patient_id -> patients.id): garante que o
+        # patient_id referenciado pertence à MESMA clinic_id desta linha —
+        # patients tem uq_patients_clinic_id_id justamente pra permitir isso.
+        sa.ForeignKeyConstraint(
+            ["clinic_id", "patient_id"],
+            ["patients.clinic_id", "patients.id"],
+            name="fk_evaluations_clinic_patient",
+        ),
+        sa.UniqueConstraint("clinic_id", "id", name="uq_evaluations_clinic_id_id"),
     )
     op.create_index(
         "ix_evaluations_clinic_patient_measured_at",

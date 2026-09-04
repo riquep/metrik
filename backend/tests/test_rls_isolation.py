@@ -2,6 +2,11 @@ import uuid
 from datetime import datetime, timezone
 
 import pytest
+
+# sqlalchemy só vem com o extra opcional `db` — pula o módulo inteiro (em vez
+# de quebrar a collection do pytest) se só `.[dev]` estiver instalado.
+pytest.importorskip("sqlalchemy")
+
 from sqlalchemy.exc import ProgrammingError
 
 from metrik.db.base import tenant_session

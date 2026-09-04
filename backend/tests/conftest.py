@@ -18,8 +18,20 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
+
+# sqlalchemy só vem com o extra opcional `db` (pip install -e ".[dev,db]") —
+# de propósito, pra não obrigar quem só quer rodar os testes do
+# parser/harness (`.[dev]`) a instalar SQLAlchemy/psycopg. Sem o import
+# guardado aqui, a collection do pytest inteira quebraria com
+# ModuleNotFoundError antes mesmo do skip abaixo rodar, derrubando também
+# os testes que não têm nada a ver com banco.
+try:
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.orm import sessionmaker
+
+    _SQLALCHEMY_AVAILABLE = True
+except ImportError:
+    _SQLALCHEMY_AVAILABLE = False
 
 BACKEND_DIR = Path(__file__).parent.parent
 
@@ -48,6 +60,11 @@ def _run_alembic(command: str, target: str) -> None:
 
 @pytest.fixture(scope="session")
 def db_available() -> None:
+    if not _SQLALCHEMY_AVAILABLE:
+        pytest.skip(
+            "SQLAlchemy não instalado — rode `pip install -e \".[dev,db]\"` "
+            "pra habilitar os testes de banco."
+        )
     try:
         engine = create_engine(TEST_ADMIN_DATABASE_URL)
         with engine.connect():

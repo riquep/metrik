@@ -35,18 +35,20 @@ def upgrade() -> None:
             sa.ForeignKey("clinics.id"),
             nullable=False,
         ),
-        sa.Column(
-            "evaluation_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("evaluations.id"),
-            nullable=False,
-        ),
+        sa.Column("evaluation_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("key", sa.Text(), nullable=False),
         sa.Column("value", sa.Numeric(), nullable=False),
         sa.Column("unit", sa.Text(), nullable=True),
         sa.Column("ref_min", sa.Numeric(), nullable=True),
         sa.Column("ref_max", sa.Numeric(), nullable=True),
         sa.UniqueConstraint("evaluation_id", "key", name="uq_metrics_evaluation_key"),
+        # FK composta: garante que evaluation_id pertence à mesma clinic_id
+        # desta métrica — evaluations tem uq_evaluations_clinic_id_id.
+        sa.ForeignKeyConstraint(
+            ["clinic_id", "evaluation_id"],
+            ["evaluations.clinic_id", "evaluations.id"],
+            name="fk_metrics_clinic_evaluation",
+        ),
     )
     op.create_index("ix_metrics_evaluation_id", "metrics", ["evaluation_id"])
 
